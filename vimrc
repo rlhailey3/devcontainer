@@ -18,7 +18,7 @@ colorscheme dracula
 "
 "" COC Extensions
 "
-let g:coc_global_extensions = ['coc-yaml', 'coc-sh', 'coc-git', 'coc-docker', 'coc-clangd', 'coc-json', 'coc-pyright']
+"let g:coc_global_extensions = ['coc-yaml', 'coc-sh', 'coc-git', 'coc-docker', 'coc-clangd', 'coc-json', 'coc-pyright']
 
 
 "
