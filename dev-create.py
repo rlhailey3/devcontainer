@@ -3,14 +3,16 @@
 import json
 import os
 import argparse
+import time
 
 
 def main():
     config_file = ".devcontainer"
     container_image = "dev:latest"
+    default_name = "dev-{0}-{1}".format(os.path.basename(os.getcwd()), time.time())
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-n", "--name", dest="name", type=str, help="name of the dev container", default="dev-{0}".format(os.path.basename(os.getcwd())))
+    parser.add_argument("-n", "--name", dest="name", type=str, help="name of the dev container", default=default_name)
     parser.add_argument("-H", "--hostname", dest="hostname", type=str, help="hostname of the dev container", default="dev")
     parser.add_argument("-i", "--image", dest="image", type=str, help="container image to use", default=container_image)
     parser.add_argument("-d", "--directory", dest="directory", type=str, help="directory path of project", default=os.getcwd())
