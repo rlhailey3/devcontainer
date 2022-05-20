@@ -12,11 +12,12 @@ def main():
             config: dict[str,str] = json.load(file)
         if search_container(config):
             if delete_container(config):
+                os.remove(config_file)
                 print("[+] Container deleted")
             else:
                 print("[-] Unable to delete container")
-        else:
-            print("[-] Container does not exist")
+    else:
+        print("[-] devcontainer does not exist for this project")
 
 def delete_container(config: dict[str, str]) -> int:
     rm_command: list[str] = ["podman", "rm", config["name"]]
