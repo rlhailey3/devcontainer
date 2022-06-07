@@ -24,13 +24,18 @@ def run_container(config: dict[str,str]) -> int:
     if search_container(config) == "":
         print("[-] Container does not exist -- run dev-create.py")
         return 0
-    unshare_start_command: list[str] = ["podman", "unshare", "chown", "1000:1000", "-R", config["directory"]]
+    unshare_start_command: list[str] = ["podman", "unshare", "chown", f"{os.getuid()}:{os.getgid()}", "-R", config["directory"]]
     unshare_end_command: list[str] = ["podman", "unshare", "chown","0:0", "-R", config["directory"]]
-    run_command: list[str] = ["podman", "start", "--attach", config["name"]]
+    #run_command: list[str] = ["podman", "start", "--attach", config["name"]]
+    run_command: list[str] = ["podman", "start", config["name"]]
+    exec_command: list[str] = ["podman", "exec", "-it", config["name"], "zsh"]
+    stop_command: list[str] = ["podman", "stop", "--time", "0", config["name"]]
     if not subprocess.call(unshare_start_command):
         if not subprocess.call(run_command):
-            if not subprocess.call(unshare_end_command):
-                return 1
+            if not subprocess.call(exec_command):
+                if not subprocess.call(unshare_end_command):
+                    if not subprocess.call(stop_command):
+                        return 1
         print("[-] unable to start devcontainer")
     print("[-] unable to change project directory permissions")
     return 0

@@ -1,25 +1,29 @@
-"
-" PERSONAL CONFIG
-"
+" Plugins will be downloaded under the specified directory.
+call plug#begin(has('nvim') ? stdpath('data') . '/plugged' : '~/.vim/plugged')
+
+Plug 'dracula/vim'
+Plug 'ryanoasis/vim-devicons'
+Plug 'scrooloose/nerdtree'
+Plug 'mhinz/vim-startify'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
+call plug#end()
+
+let g:coc_global_extensions = ['coc-yaml', 'coc-sh', 'coc-git', 'coc-docker', 'coc-clangd', 'coc-json', 'coc-pyright']
+
+set termguicolors
+syntax enable
+colorscheme dracula
+
+set encoding=UTF-8
 set number
 set relativenumber
 set cursorline
-set ruler
-
+set ruler 
 set tabstop=4
 set shiftwidth=4
 set expandtab
 set smartindent
-
-packadd! dracula
-syntax enable
-colorscheme dracula
-
-"
-"" COC Extensions
-"
-"let g:coc_global_extensions = ['coc-yaml', 'coc-sh', 'coc-git', 'coc-docker', 'coc-clangd', 'coc-json', 'coc-pyright']
-
 
 "
 "" DEFAULT COC
@@ -191,3 +195,4 @@ nnoremap <silent><nowait> <space>j  :<C-u>CocNext<CR>
 nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list.
 nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
+

@@ -2,9 +2,11 @@ FROM fedora:latest
 
 # Install documentation for DNF packages
 RUN sed -i 's/tsflags=nodocs//' /etc/dnf/dnf.conf
+RUN echo "max_parallel_downloads=10" >> /etc/dnf/dnf.conf
+RUN echo "fastestmirror=True" >> /etc/dnf/dnf.conf
 
-# Full image update, and install findutils (find & xargs) and wget
-RUN dnf -y update &&  dnf install -y man-db man man-pages vim tmux nodejs git bash-completion clang-tools-extra @C\ Development\ Tools\ and\ Libraries
+# Full image update, and install development tools
+RUN dnf -y update &&  dnf install -y cmake man-db man man-pages neovim tmux nodejs git bash-completion zsh clang-tools-extra @C\ Development\ Tools\ and\ Libraries python-pip
 
 # Edit sudoers to allow wheel group to sudo without password
 RUN sed -i 's/^%wheel/# %wheel/' /etc/sudoers && \
@@ -17,30 +19,26 @@ ARG GID=1000
 
 # Create the user, group, and project folder
 RUN groupadd -g $GID -o $UNAME
-RUN useradd -m -u $UID -g $GID -G wheel -o -s /bin/bash $UNAME
+RUN useradd -m -u $UID -g $GID -G wheel -o -s /usr/bin/zsh $UNAME
 RUN mkdir /project
-
 
 # Change user and working dir to $UNAME
 WORKDIR /home/$UNAME
 USER $UNAME:$UNAME
-ENV PS1="<<dev>>[\u@\h \W] "
 
-# Add the .vimrc
-COPY --chown=$UID:$GID vimrc .vimrc
-COPY --chown=$UID:$GID gdbinit .gdbinit
+# Setup nvim
+RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+RUN curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+RUN sed -i "s/plugins=(git)/plugins=(git tmux)/" ~/.zshrc
+RUN sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="gnzh"/' ~/.zshrc
 
-# Install Coc.nvim
-RUN mkdir -p /home/$UNAME/.vim/pack/coc/start
-RUN mkdir -p /home/$UNAME/.vim/pack/themes/start
+# Add init.nvim
+RUN mkdir -p ~/.conf/nvim/
+COPY --chown=${UID}:${GID} init.vim /home/${UNAME}/.config/nvim/init.vim
 
-COPY --chown=$UID:$GID coc.nvim /home/$UNAME/.vim/pack/coc/start/coc.nvim
-COPY --chown=$UID:$GID dracula /home/$UNAME/.vim/pack/themes/start/dracula
-
-# Install coc-plugins
-RUN cd /home/$UNAME/.vim/pack/coc/start && \
-    vim -c "helptags coc.nvim/doc/|q" && \
-    vim -c 'CocInstall -sync coc-yaml coc-sh coc-git coc-docker coc-clangd coc-json coc-pyright|q|q'
+# Install Plugins
+RUN nvim --headless +PlugInstall +qa
+RUN nvim --headless +'CocInstall -sync coc-yaml coc-sh coc-git coc-docker coc-clangd coc-json coc-pyright' +qa
 
 # Change working dir to project directory
 WORKDIR /project
