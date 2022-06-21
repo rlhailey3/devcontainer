@@ -32,6 +32,16 @@ RUN curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://r
 RUN sed -i "s/plugins=(git)/plugins=(git tmux)/" ~/.zshrc
 RUN sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="gnzh"/' ~/.zshrc
 
+# Setup tmux
+RUN git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+# tmux plugins
+RUN echo "set -g @plugin 'tmux-plugins/tpm'" >> ~/.tmux.conf
+RUN echo "set -g @plugin 'tmux-plugins/tmux-sensible'" >> ~/.tmux.conf
+
+# end tmux plugins
+# additional tmux configs
+RUN echo run '~/.tmux/plugins/tpm/tpm' >> ~/.tmux.conf
+
 # Add init.nvim
 RUN mkdir -p ~/.conf/nvim/
 COPY --chown=${UID}:${GID} init.vim /home/${UNAME}/.config/nvim/init.vim
